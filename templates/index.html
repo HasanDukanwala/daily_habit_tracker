@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <title>Habit Tracker</title>
+</head>
+<body>
+    <h1>Welcome to Your Habit Tracker!</h1>
+    
+     {% if current_user.is_authenticated %}
+            <p>Hello, {{ current_user.email }}!</p>
+            <p><a href="{{ url_for('create_habit') }}">Create a New Habit</a></p>
+
+            {% if habits %}
+                <h2>Your Habits</h2>
+                <ul>
+                    {% for habit in habits %}
+                        <li>{{ habit.name }} - ({{ habit.frequency }}) - {{ habit.created_at.strftime('%B %d, %Y') }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You haven't created any habits yet.</p>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <p>You are a guest.</p>
+            <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+
+</body>
+</html>
