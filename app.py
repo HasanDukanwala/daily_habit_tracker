@@ -25,14 +25,16 @@ def load_user(user_id):
 
 # ---- Database Models ----
 # Import models after initializing db to avoid circular imports
-from models import User
+from models import User, Habit
 
 # A page to run when user visits the root URL (Home page)
 @app.route('/')
 def home():
     if current_user.is_authenticated:
-        return f"Hello, {current_user.email}! Welcome to your Daily Habit Tracker."
-    return "<h1>Hello, Guest.</h1><a href='register'>Register</a> or <a href='login'>Login</a>"
+        # Fetch the habits for the current logged-in user
+        habits = Habit.query.filter_by(user_id=current_user.id).all()
+        return render_template('index.html', habits=habits)
+    return render_template('index.html')
 
 # --- User Registration Route ---
 # A page to register a new user
@@ -91,6 +93,29 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
+
+# Route to display the form and process it
+@app.route('/create_habit', methods=['GET', 'POST'])
+@login_required # Only logged-in users can create habits
+def create_habit():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        frequency = request.form.get('frequency')
+        habit_type = request.form.get('type')
+
+        new_habit = Habit(
+            name=name, 
+            frequency=frequency, 
+            type=habit_type, 
+            user_id=current_user.id
+        )
+
+        db.session.add(new_habit)
+        db.session.commit()
+        flash('Habit created successfully!', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('create_habit.html')
 
 
 if __name__ == '__main__':
