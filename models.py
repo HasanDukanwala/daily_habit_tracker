@@ -16,7 +16,7 @@ class Habit(db.Model):
     description = db.Column(db.String(255))
     frequency = db.Column(db.String(50), nullable=False)
     type = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now(datetime.timezone.utc))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Foreign key to link habit to a user
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
